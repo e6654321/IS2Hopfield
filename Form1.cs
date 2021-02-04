@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Threading;
 using HopfieldNeuralNetwork;
 
 namespace IS2HopfieldNetwork
@@ -15,15 +16,10 @@ namespace IS2HopfieldNetwork
     {
         NeuralNetwork NN = new NeuralNetwork(100);
         Bitmap[] m = new Bitmap[10];
-        private void NN_EnergyChanged(object sender, EnergyEventArgs e)
-        {
-        }
 
         public Form1()
         {
             InitializeComponent();
-
-            NN.EnergyChanged += new EnergyChangedHandler(NN_EnergyChanged);
             label1.Text = (NN.M).ToString();
         }
 
@@ -33,56 +29,66 @@ namespace IS2HopfieldNetwork
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 m[0] = new Bitmap(openFileDialog1.FileName);
+
+                List<Neuron> pattern = bitmapToPattern(m[0]);
+
                 imageMagnifier1.ImageToMagnify = m[0];
-                // display image in picture box
                 imageMagnifier1.MagnificationCoefficient = 10;
-                // image file path  
-                //textBox1.Text = open.FileName;
-                //NN.AddPattern(bitmapToPattern(m[0]));
-                NN.AddRandomPattern();
-                imageMagnifier3.ImageToMagnify = patternToBitmap(NN.Neurons, m[0]);
+
+                NN.AddPattern(pattern);
+                for (int i = 0; i < NN.Neurons.Count; i++)
+                {
+                    Console.WriteLine(NN.Neurons[i].State);
+                }
+
+                Bitmap bitmap = patternToBitmap(NN.Neurons);
+                imageMagnifier3.ImageToMagnify = bitmap;
                 imageMagnifier3.MagnificationCoefficient = 10;
 
-                List<Neuron> pattern = generateRandomPattern(100);
+                List<Neuron> randomPattern = generateRandomPattern(100);
+                imageMagnifier2.ImageToMagnify = patternToBitmap(randomPattern);
+                imageMagnifier2.MagnificationCoefficient = 10;
 
-                //imageMagnifier2.ImageToMagnify = patternToBitmap(pattern, m[0]);
-                //imageMagnifier2.MagnificationCoefficient = 10;
                 label1.Text = (NN.M).ToString();
             }
         }
 
         private List<Neuron> bitmapToPattern(Bitmap b)
         {
-            List<Neuron> pattern = new List<Neuron>(100);
-            Neuron n = new Neuron();
+            int bitmapSize = b.Width * b.Height;
+            List<Neuron> p = new List<Neuron>(bitmapSize);
             Color c;
 
             for (int i = 0; i < b.Width; i ++)
             {
                 for (int j = 0; j < b.Height; j++)
                 {
+                    Neuron n = new Neuron();
+
                     c = b.GetPixel(i, j);
 
-                    n.State = c.R > 0 ? 1 : -1;
+                    n.State = c.R > 127 ? 1 : -1;
 
-                    pattern.Add(n);
+                    p.Add(n);
+                    //Console.WriteLine(p[p.Count-1].State);
                 }
             }
 
-            return pattern;
+            return p;
         }
 
-        private Bitmap patternToBitmap(List<Neuron> p, Image init)
+        private Bitmap patternToBitmap(List<Neuron> p)
         {
-            Bitmap bitmap = new Bitmap(init);
+            int size = 10;
+            Bitmap bitmap = new Bitmap(size, size);
             Color c;
 
-            for (int i = 0; i < init.Width ; i++)
+            for (int i = 0; i < size; i++)
             {
-                for (int j = 0; j < init.Height; j++)
+                for (int j = 0; j < size; j++)
                 {
-                    int val = p[init.Width * i + j].State > 0 ? 255 : 0;
-                    Console.WriteLine(val + ": " + p[init.Width * i + j].State);
+                    int val = p[(size * i) + j].State >= 0 ? 255 : 0;
+                    //Console.WriteLine(val + ": " + p[init.Width * i + j].State);
 
                     c = Color.FromArgb(val, val, val);
 
@@ -101,7 +107,7 @@ namespace IS2HopfieldNetwork
             for (int i = 0; i < size; i++)
             {
                 Neuron n = new Neuron();
-                n.State = rand.Next(2) > 0 ? 1 : -1; ;
+                n.State = rand.Next(2) > 0 ? 1 : -1;
                 pattern.Add(n);
             }
 
@@ -110,10 +116,11 @@ namespace IS2HopfieldNetwork
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //Bitmap b = new Bitmap(imageMagnifier2.ImageToMagnify);
-            //NN.Run(bitmapToPattern(b));
-            NN.AddRandomPattern();
-            imageMagnifier3.ImageToMagnify = patternToBitmap(NN.Neurons, m[0]);
+            Bitmap b = new Bitmap(imageMagnifier2.ImageToMagnify);
+            List<Neuron> pattern = bitmapToPattern(b);
+            NN.Run(pattern);
+            //NN.AddRandomPattern();
+            imageMagnifier3.ImageToMagnify = patternToBitmap(NN.Neurons);
             imageMagnifier3.MagnificationCoefficient = 10;
         }
     }
