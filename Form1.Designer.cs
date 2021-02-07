@@ -36,6 +36,7 @@ namespace IS2HopfieldNetwork
             this.button2 = new System.Windows.Forms.Button();
             this.imageMagnifier3 = new ImageMagnifier.ImageMagnifier();
             this.label1 = new System.Windows.Forms.Label();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.SuspendLayout();
             // 
             // button1
@@ -101,11 +102,22 @@ namespace IS2HopfieldNetwork
             this.label1.TabIndex = 8;
             this.label1.Text = "0";
             // 
+            // panel1
+            // 
+            this.panel1.Location = new System.Drawing.Point(13, 229);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(201, 211);
+            this.panel1.TabIndex = 9;
+            this.panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.panel1_Paint);
+            this.panel1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseDown);
+            this.panel1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.panel1_MouseMove);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(758, 373);
+            this.ClientSize = new System.Drawing.Size(758, 443);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.imageMagnifier3);
             this.Controls.Add(this.button2);
@@ -127,6 +139,7 @@ namespace IS2HopfieldNetwork
         private System.Windows.Forms.Button button2;
         private ImageMagnifier.ImageMagnifier imageMagnifier3;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 
